@@ -1,0 +1,62 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request: 
+    types: [ opened, synchronize, reopened, labeled ]
+    branches: 
+      - master
+  # schedule:
+    # - cron: '0 0 * * 0'  # every week at midnight on sunday
+    # - cron: '*/5 * * * *' # every five minutes
+
+env:
+  DOCKER_REGISTRY: us-east1-docker.pkg.dev
+  IMAGE_VERSION: latest
+  DOCKER_IMAGE: ${{ secrets.GKE_PROJECT }}/webui/gh-runner
+  GKE_CLUSTER: jx-prod
+  GKE_ZONE: us-east1-b
+
+jobs:
+  build-gh-runner-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Setup nuxeo yam repository
+        run: |
+          echo -e "[nuxeo]\nname=Nexus Private Yum Release Repository\nbaseurl=https://packages.nuxeo.com/repository/yum-registry/\nusername=${{ secrets.YUM_REPO_USERNAME }}\npassword=${{ secrets.YUM_REPO_PASSWORD }}\nenabled=1\ngpgcheck=0" > nuxeo.repo
+
+      - name: Build and push image
+        uses: docker/build-push-action@v1
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: _json_key
+          password: ${{ secrets.GKE_SA_KEY }}
+          push: true
+          repository: ${{ secrets.GKE_PROJECT }}/webui/gh-runner
+          tags: ${{ env.IMAGE_VERSION }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v0.2.1
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
+
+      # testing this before creating a helm chart
+      - name: Install runner image
+        run: |
+          # create the kustomization.yaml file for kustomize
+          kustomize create --resources manifests/deployment.yaml,manifests/hpa.yaml --namespace webui
+          kustomize edit add secret web-ui-gh-runner-secret --from-literal=GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          kustomize edit set image webui/runner:latest=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE }}
+
+          # create the k8s deployment 
+          kustomize build . | kubectl apply -f - 
+
+          # clean up the workspace
+          kustomize build . | kubectl apply -f - 

@@ -7,9 +7,8 @@ on:
     types: [ opened, synchronize, reopened, labeled ]
     branches: 
       - master
-  # schedule:
-    # - cron: '0 0 * * 0'  # every week at midnight on sunday
-    # - cron: '*/5 * * * *' # every five minutes
+  schedule:
+    - cron: '0 0 * * 0'  # every week at midnight on sunday
 
 env:
   DOCKER_REGISTRY: us-east1-docker.pkg.dev
@@ -17,9 +16,10 @@ env:
   DOCKER_IMAGE: ${{ secrets.GKE_PROJECT }}/webui/gh-runner
   GKE_CLUSTER: jx-prod
   GKE_ZONE: us-east1-b
+  RUNNER_NAMESPACE: webui
 
 jobs:
-  build-gh-runner-image:
+  runner-image:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -47,11 +47,21 @@ jobs:
           project_id: ${{ secrets.GKE_PROJECT }}
           credentials: ${{ secrets.GKE_SA_KEY }}
 
+      - name: Check runner namespace
+        id: runner_ns
+        run: |
+          echo ::set-output name=exists::$(kubectl get namespace ${RUNNER_NAMESPACE})
+
+      - name: Create runner namespace
+        if: ${{ !steps.runner_ns.outputs.exists }}
+        run: |
+          kubectl create namespace ${{ env.RUNNER_NAMESPACE }}
+
       # testing this before creating a helm chart
       - name: Install runner image
         run: |
           # create the kustomization.yaml file for kustomize
-          kustomize create --resources manifests/deployment.yaml,manifests/hpa.yaml --namespace webui
+          kustomize create --resources manifests/deployment.yaml,manifests/hpa.yaml --namespace ${{ env.RUNNER_NAMESPACE }}
           kustomize edit add secret web-ui-gh-runner-secret --from-literal=GITHUB_TOKEN=${{ secrets.ACCESS_TOKEN }}
           kustomize edit set image webui/runner:latest=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE }}
 

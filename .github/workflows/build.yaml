@@ -52,7 +52,7 @@ jobs:
         run: |
           # create the kustomization.yaml file for kustomize
           kustomize create --resources manifests/deployment.yaml,manifests/hpa.yaml --namespace webui
-          kustomize edit add secret web-ui-gh-runner-secret --from-literal=GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          kustomize edit add secret web-ui-gh-runner-secret --from-literal=GITHUB_TOKEN=${{ secrets.ACCESS_TOKEN }}
           kustomize edit set image webui/runner:latest=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE }}
 
           # create the k8s deployment 

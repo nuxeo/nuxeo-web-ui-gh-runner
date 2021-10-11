@@ -67,7 +67,7 @@ RUN yum install -y google-chrome-stable \
 CMD ["google-chrome","-version"]
 
 # Install GH Runner
-ARG GH_RUNNER_VERSION="2.276.1"
+ARG GH_RUNNER_VERSION="2.283.2"
 WORKDIR /runner
 RUN yum -y install jq
 RUN curl -o actions.tar.gz --location "https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/actions-runner-linux-x64-${GH_RUNNER_VERSION}.tar.gz" && \

@@ -2,22 +2,12 @@
 
 Based on the work done in https://github.com/bharathkkb/gh-runners/tree/master/gke
 
+Regularly builds and deploys a new runner image to be used by [Nuxeo Web UI](https://github.com/nuxeo/nuxeo-web-ui).
+
 ### Prerequisites
 
-- `kubectl`, `kustomize`
-- k8s cluster with a webui namespace
-
-### Deploying
-
-`make deploy`
-
-This will deploy latest runner image from the registry
-
-### Building the runner image
-
-`make image`
-
-This will build and push the self hosted runned image.
+- `kubectl`
+- k8s cluster (if the `webui` namespace doesn't exist, one is created by the `build` workflow)
 
 ## License
 

@@ -1,0 +1,14 @@
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 4
+  resource:
+    type: cpu
+    targetAverageUtilization: 25
+
+resources: 
+  limits:
+    memory: "4Gi"
+    cpu: "4"
+  requests:
+    memory: "3Gi"
+    cpu: "3"

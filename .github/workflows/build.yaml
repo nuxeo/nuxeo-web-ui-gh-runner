@@ -17,6 +17,7 @@ env:
   GKE_CLUSTER: jx-prod
   GKE_ZONE: us-east1-b
   RUNNER_NAMESPACE: webui
+  GITHUB_ACTIONS_SECRET_KEY: web-ui-gh-runner-secret
 
 jobs:
   runner-image:
@@ -57,16 +58,27 @@ jobs:
         run: |
           kubectl create namespace ${{ env.RUNNER_NAMESPACE }}
 
+      - name: Check github actions secret
+        id: gh_secret
+        run: |
+          echo ::set-output name=exists::$(kubectl get secret ${GITHUB_ACTIONS_SECRET_KEY} --namespace ${RUNNER_NAMESPACE})
+
+      - name: Create github actions secret
+        if: ${{ !steps.gh_secret.outputs.exists }}
+        run: |
+          # create the necessary secret to register the runner in nuxeo-web-ui repository
+          kubectl create secret generic ${{ env.GITHUB_ACTIONS_SECRET_KEY }} --from-literal=GITHUB_TOKEN=${{ secrets.ACCESS_TOKEN }} --namespace ${{ env.RUNNER_NAMESPACE }}
+
       # testing this before creating a helm chart
       - name: Install runner image
+        id: runner
+        working-directory: ./charts/runner
         run: |
-          # create the kustomization.yaml file for kustomize
-          kustomize create --resources manifests/deployment.yaml,manifests/hpa.yaml --namespace ${{ env.RUNNER_NAMESPACE }}
-          kustomize edit add secret web-ui-gh-runner-secret --from-literal=GITHUB_TOKEN=${{ secrets.ACCESS_TOKEN }}
-          kustomize edit set image webui/runner:latest=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE }}
+          # install Helm
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash -
 
-          # create the k8s deployment 
-          kustomize build . | kubectl apply -f - 
+          # update helm deps
+          helm dependency update .
 
-          # clean up the workspace
-          kustomize build . | kubectl apply -f - 
+          # install
+          helm upgrade --install --namespace ${RUNNER_NAMESPACE} ${RUNNER_NAMESPACE} .

@@ -16,10 +16,11 @@ spec:
     spec:
       containers:
         - name: runner
-          image: webui/runner:latest
+          image: "{{ .Values.runner.image.repository }}:{{ .Values.runner.image.tag }}"
+          imagePullPolicy: {{ .Values.runner.image.pullPolicy }}
           envFrom:
             - secretRef:
-                name: web-ui-gh-runner-secret
+                name: {{ .Values.runner.githubSecret.name }}
           env:
             - name: REPO_OWNER
               value: nuxeo
@@ -46,4 +47,3 @@ spec:
           key: team
           operator: Equal
           value: ui
-          

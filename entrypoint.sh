@@ -5,7 +5,7 @@ TOKEN_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runne
 
 echo "Getting registration token from ${TOKEN_URL}"
 
-# get regsistration token for this runnner
+# get registration token for this runnner
 RUNNER_TOKEN="$(curl -sS --request POST --url "${TOKEN_URL}" --header "authorization: Bearer ${GITHUB_TOKEN}"  --header 'content-type: application/json' | jq -r .token)"
 
 # configure runner

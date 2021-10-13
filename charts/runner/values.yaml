@@ -12,3 +12,12 @@ resources:
   requests:
     memory: "3Gi"
     cpu: "3"
+
+runner:
+  image:
+    repository: $DOCKER_REGISTRY/$DOCKER_IMAGE
+    tag: $IMAGE_VERSION
+    pullPolicy: Always
+  githubSecret:
+    name: web-ui-gh-runner-secret
+    token: $GITHUB_ACCESS_TOKEN

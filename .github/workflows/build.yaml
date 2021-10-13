@@ -3,10 +3,6 @@ name: Build
 on:
   push:
     branches: [ master ]
-  pull_request: 
-    types: [ opened, synchronize, reopened, labeled ]
-    branches: 
-      - master
   schedule:
     - cron: '0 0 * * 0'  # every week at midnight on sunday
 
@@ -17,7 +13,7 @@ env:
   GKE_CLUSTER: jx-prod
   GKE_ZONE: us-east1-b
   RUNNER_NAMESPACE: webui
-  GITHUB_ACTIONS_SECRET_KEY: web-ui-gh-runner-secret
+  GITHUB_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
 jobs:
   runner-image:
@@ -58,27 +54,13 @@ jobs:
         run: |
           kubectl create namespace ${{ env.RUNNER_NAMESPACE }}
 
-      - name: Check github actions secret
-        id: gh_secret
-        run: |
-          echo ::set-output name=exists::$(kubectl get secret ${GITHUB_ACTIONS_SECRET_KEY} --namespace ${RUNNER_NAMESPACE})
-
-      - name: Create github actions secret
-        if: ${{ !steps.gh_secret.outputs.exists }}
-        run: |
-          # create the necessary secret to register the runner in nuxeo-web-ui repository
-          kubectl create secret generic ${{ env.GITHUB_ACTIONS_SECRET_KEY }} --from-literal=GITHUB_TOKEN=${{ secrets.ACCESS_TOKEN }} --namespace ${{ env.RUNNER_NAMESPACE }}
-
-      # testing this before creating a helm chart
       - name: Install runner image
         id: runner
         working-directory: ./charts/runner
         run: |
-          # install Helm
-          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash -
-
-          # update helm deps
-          helm dependency update .
+          # substitute env variables in values.yaml
+          mv values.yaml values.yaml.tosubst
+          envsubst < values.yaml.tosubst > values.yaml
 
           # install
           helm upgrade --install --namespace ${RUNNER_NAMESPACE} ${RUNNER_NAMESPACE} .

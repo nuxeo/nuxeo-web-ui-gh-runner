@@ -55,7 +55,7 @@ RUN yum -y update && yum -y install epel-release && yum -y --setopt=skip_missing
 RUN alternatives --set java java-${JDK_VERSION}-openjdk.x86_64
 
 # Install Node.jx
-ARG NODEJS_VERSION
+ARG NODEJS_VERSION=10
 RUN curl -f --silent --location https://rpm.nodesource.com/setup_$NODEJS_VERSION.x | bash - && \
     yum install -y nodejs && \
     yum install -y gcc-c++ make

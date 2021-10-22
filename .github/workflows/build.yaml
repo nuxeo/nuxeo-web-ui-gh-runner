@@ -3,6 +3,9 @@ name: Build
 on:
   push:
     branches: [ master ]
+  pull_request: 
+    branches: [ master ]
+    types: [opened, synchronize, edited]
   schedule:
     - cron: '0 0 * * 0'  # every week at midnight on sunday
 
@@ -33,7 +36,7 @@ jobs:
           username: _json_key
           password: ${{ secrets.GKE_SA_KEY }}
           push: true
-          repository: ${{ secrets.GKE_PROJECT }}/webui/gh-runner
+          repository: ${{ env.DOCKER_IMAGE }}
           tags: ${{ env.IMAGE_VERSION }}
 
       - name: Get GKE credentials

@@ -60,6 +60,11 @@ RUN curl -f --silent --location https://rpm.nodesource.com/setup_$NODEJS_VERSION
     yum install -y nodejs && \
     yum install -y gcc-c++ make
 
+# Install Git and Bower (for Web UI 10.10)
+RUN yum install -y git \
+  && npm install -g bower \
+  && npm install -g gulp-cli
+
 # Install Chrome
 RUN yum install -y google-chrome-stable \
   && yum clean all

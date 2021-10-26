@@ -25,10 +25,6 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: Setup nuxeo yam repository
-        run: |
-          echo -e "[nuxeo]\nname=Nexus Private Yum Release Repository\nbaseurl=https://packages.nuxeo.com/repository/yum-registry/\nusername=${{ secrets.YUM_REPO_USERNAME }}\npassword=${{ secrets.YUM_REPO_PASSWORD }}\nenabled=1\ngpgcheck=0" > nuxeo.repo
-
       - name: Build and push image
         uses: docker/build-push-action@v1
         with:

@@ -9,6 +9,16 @@ Regularly builds and deploys a new runner image to be used by [Nuxeo Web UI](htt
 - `kubectl`
 - k8s cluster (if the `webui` namespace doesn't exist, one is created by the `build` workflow)
 
+## To build and test the runner image locally
+
+To test the runner image locally, you need to have `docker` installed and run:
+
+```
+> docker image build .
+
+> docker run <IMAGE_ID>
+```
+
 ## License
 
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) 

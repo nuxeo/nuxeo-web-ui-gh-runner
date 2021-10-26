@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-FROM centos:7
+FROM ubuntu:latest
 
 ARG DESCRIPTION="Maven+NodeJS and Chrome image for the Nuxeo WebUI build"
 ARG SCM_REPOSITORY=git@github.com:nuxeo/nuxeo-web-ui-gh-runner.git
@@ -23,9 +23,9 @@ LABEL scm-url=${SCM_REPOSITORY}
 LABEL version=${VERSION}
 LABEL scm-ref=${SCM_REF}
 
-# Add Yum repositories
-COPY nuxeo.repo /etc/yum.repos.d/
-COPY google-chrome.repo /etc/yum.repos.d/
+# upgrade and install common software
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get -yq update && apt-get install -yq software-properties-common curl wget git
 
 # Install Maven
 ARG MAVEN_VERSION=3.8.3
@@ -35,46 +35,41 @@ ENV maven.home ${M2_HOME}
 ENV M2 ${M2_HOME}/bin
 ENV PATH ${M2}:${PATH}
 
+# Init settings.xml
+RUN mkdir -p /root/.m2 && \
+  touch /root/.m2/settings.xml
+
 # Install Java and conversion tools
 ARG JDK_VERSION=11
-RUN yum -y update && yum -y install epel-release && yum -y --setopt=skip_missing_names_on_install=False --enablerepo nuxeo install \
-  ccextractor \
-  ffmpeg-nuxeo \
-  ghostscript \
-  ImageMagick-6.9.10.68-3.el7 \
-  java-$JDK_VERSION-openjdk java-$JDK_VERSION-openjdk-devel \
-  libreoffice-calc libreoffice-headless libreoffice-impress libreoffice-writer \
-  libwpd-tools \
-  # required by perl-Image-ExifTool to extract binary metadata from open office document
-  perl-Archive-Zip \
-  perl-Image-ExifTool \
+RUN apt-get install -yq openjdk-$JDK_VERSION-jdk-headless \
+  imagemagick \
   poppler-utils \
-  ufraw
+  libreoffice \
+  ffmpeg \
+  libwpd-tools \
+  ghostscript \
+  exiftool
 
-# Set $JDK_VERSION as default Java (libreoffice adds Java 8)
-RUN alternatives --set java java-${JDK_VERSION}-openjdk.x86_64
+# set default JAVA_HOME
+RUN echo 'export JAVA_HOME=$(readlink -f `which javac` | sed "s:/bin/javac::")/bin/java' >> ~/.bashrc
 
 # Install Node.jx
 ARG NODEJS_VERSION=10
-RUN curl -f --silent --location https://rpm.nodesource.com/setup_$NODEJS_VERSION.x | bash - && \
-    yum install -y nodejs && \
-    yum install -y gcc-c++ make
-
-# Install Git and Bower (for Web UI 10.10)
-RUN yum install -y git \
-  && npm install -g bower \
-  && npm install -g gulp-cli
+RUN curl -f --location https://deb.nodesource.com/setup_$NODEJS_VERSION.x | bash - && \
+    apt-get install -yq nodejs && \
+    apt-get install -yq g++ build-essential
 
 # Install Chrome
-RUN yum install -y google-chrome-stable \
-  && yum clean all
-
-CMD ["google-chrome","-version"]
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+  echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list && \
+  apt-get -yq update && \
+  apt-get -yq install google-chrome-stable && \
+  rm -r /etc/apt/sources.list.d/google.list
 
 # Install GH Runner
 ARG GH_RUNNER_VERSION="2.283.2"
 WORKDIR /runner
-RUN yum -y install jq
+RUN apt-get install -yq jq
 RUN curl -o actions.tar.gz --location "https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/actions-runner-linux-x64-${GH_RUNNER_VERSION}.tar.gz" && \
     tar -zxf actions.tar.gz && \
     rm -f actions.tar.gz && \

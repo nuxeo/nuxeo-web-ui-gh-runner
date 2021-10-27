@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: web-ui-gh-runner-deployment
   labels:
-    chart: runner
+    app: runner
 spec:
   replicas: 1
   selector:
@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: runner
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
     spec:
       containers:
         - name: runner

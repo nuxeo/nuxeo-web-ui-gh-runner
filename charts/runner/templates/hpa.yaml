@@ -3,7 +3,7 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: web-ui-gh-runner-deployment-hpa
   labels:
-    chart: runner
+    app: runner
 spec:
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}

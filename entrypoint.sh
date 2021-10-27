@@ -17,7 +17,7 @@ export RUNNER_ALLOW_RUNASROOT=1
   --work "/tmp" \
   --url "$REPO_URL" \
   --token "$RUNNER_TOKEN" \
-  --labels k8s-runner
+  --labels master,k8s-runner
 
 # start runner
 # https://github.com/actions/runner/issues/246#issuecomment-615293718

@@ -3,9 +3,6 @@ name: Build
 on:
   push:
     branches: [ master ]
-  pull_request: 
-    branches: [ master ]
-    types: [opened, synchronize, edited]
   schedule:
     - cron: '0 0 * * 0'  # every week at midnight on sunday
 

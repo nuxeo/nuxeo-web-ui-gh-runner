@@ -2,4 +2,4 @@ apiVersion: v2
 name: runner
 description: A Helm chart for custom Nuxeo Web UI Github Actions Runners
 type: application
-version: 0.1.0
+version: 1.0.0

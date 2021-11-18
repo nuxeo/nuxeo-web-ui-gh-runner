@@ -25,7 +25,7 @@ LABEL scm-ref=${SCM_REF}
 
 # upgrade and install common software
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -yq update && apt-get install -yq software-properties-common curl wget git zip unzip
+RUN apt-get -yq update && apt-get install -yq software-properties-common curl wget git zip unzip nano
 
 # Install Maven
 ARG MAVEN_VERSION=3.8.3

@@ -58,6 +58,7 @@ ARG NODEJS_VERSION=10
 RUN curl -f --location https://deb.nodesource.com/setup_$NODEJS_VERSION.x | bash - && \
     apt-get install -yq nodejs && \
     apt-get install -yq g++ build-essential
+ENV NODE_OPTIONS --max-old-space-size=2048
 
 # Install Chrome
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \

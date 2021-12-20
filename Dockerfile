@@ -67,6 +67,11 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
   apt-get -yq install google-chrome-stable && \
   rm -r /etc/apt/sources.list.d/google.list
 
+# Support Web UI LTS2019
+RUN apt-get install -yq rsync && \
+  npm install -g bower && \
+  npm install -g gulp-cli
+
 # Install GH Runner
 ARG GH_RUNNER_VERSION="2.283.2"
 WORKDIR /runner

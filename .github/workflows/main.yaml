@@ -1,0 +1,14 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '0 0 * * 0'  # every week at midnight on sunday
+
+jobs:
+  build:
+    uses: nuxeo/nuxeo-web-ui-gh-runner/.github/workflows/build.yaml@master
+  deploy:
+    needs: build
+    uses: nuxeo/nuxeo-web-ui-gh-runner/.github/workflows/deploy.yaml@master

@@ -1,4 +1,4 @@
-name: Deploy latest runner image to k8s cluster
+name: Deploy
 
 on:
   workflow_dispatch:

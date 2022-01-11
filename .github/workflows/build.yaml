@@ -1,20 +1,13 @@
-name: Build and deploy runner image to k8s cluster
+name: Build
 
 on:
-  push:
-    branches: [ master ]
-  schedule:
-    - cron: '0 0 * * 0'  # every week at midnight on sunday
   workflow_dispatch:
+  workflow_call:
 
 env:
   DOCKER_REGISTRY: us-east1-docker.pkg.dev
   IMAGE_VERSION: latest
   DOCKER_IMAGE: ${{ secrets.GKE_PROJECT }}/webui/gh-runner
-  GKE_CLUSTER: jx-prod
-  GKE_ZONE: us-east1-b
-  RUNNER_NAMESPACE: webui
-  GITHUB_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
 jobs:
   build-runner-image:
@@ -32,6 +25,3 @@ jobs:
           push: true
           repository: ${{ env.DOCKER_IMAGE }}
           tags: ${{ env.IMAGE_VERSION }}
-
-  deploy-runner-image:
-    uses: .github/workflows/deploy.yaml@master

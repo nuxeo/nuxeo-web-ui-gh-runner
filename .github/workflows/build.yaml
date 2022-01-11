@@ -1,10 +1,11 @@
-name: Build
+name: Build and deploy runner image to k8s cluster
 
 on:
   push:
     branches: [ master ]
   schedule:
     - cron: '0 0 * * 0'  # every week at midnight on sunday
+  workflow_dispatch:
 
 env:
   DOCKER_REGISTRY: us-east1-docker.pkg.dev

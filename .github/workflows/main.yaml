@@ -12,10 +12,11 @@ jobs:
     uses: nuxeo/nuxeo-web-ui-gh-runner/.github/workflows/build.yaml@master
     secrets:
       GKE_SA_KEY: ${{ secrets.GKE_SA_KEY }}
+      GKE_PROJECT: ${{ secrets.GKE_PROJECT }}
   deploy:
     needs: build
     uses: nuxeo/nuxeo-web-ui-gh-runner/.github/workflows/deploy.yaml@master
     secrets:
       GKE_SA_KEY: ${{ secrets.GKE_SA_KEY }}
-      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       GKE_PROJECT: ${{ secrets.GKE_PROJECT }}
+      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}

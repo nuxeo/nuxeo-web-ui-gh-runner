@@ -1,0 +1,47 @@
+name: Deploy latest runner image to k8s cluster
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+env:
+  GKE_CLUSTER: jx-prod
+  GKE_ZONE: us-east1-b
+  RUNNER_NAMESPACE: webui
+  GITHUB_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+jobs:
+  runner-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v0.2.1
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
+
+      - name: Check runner namespace
+        id: runner_ns
+        run: |
+          echo ::set-output name=exists::$(kubectl get namespace ${RUNNER_NAMESPACE})
+
+      - name: Create runner namespace
+        if: ${{ !steps.runner_ns.outputs.exists }}
+        run: |
+          kubectl create namespace ${{ env.RUNNER_NAMESPACE }}
+
+      - name: Install runner image
+        id: runner
+        working-directory: ./charts/runner
+        run: |
+          # substitute env variables in values.yaml
+          mv values.yaml values.yaml.tosubst
+          envsubst < values.yaml.tosubst > values.yaml
+
+          # install
+          helm upgrade --install --namespace ${RUNNER_NAMESPACE} ${RUNNER_NAMESPACE} .

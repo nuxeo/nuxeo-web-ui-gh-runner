@@ -3,11 +3,24 @@ name: Deploy
 on:
   workflow_dispatch:
   workflow_call:
+    secrets:
+      GKE_SA_KEY:
+        description: 'GKE_SA_KEY'
+        required: true
+      GKE_PROJECT:
+        description: 'GKE_PROJECT'
+        required: true
+      ACCESS_TOKEN:
+        description: 'ACCESS_TOKEN'
+        required: true
 
 env:
   GKE_CLUSTER: jx-prod
   GKE_ZONE: us-east1-b
   RUNNER_NAMESPACE: webui
+  DOCKER_REGISTRY: us-east1-docker.pkg.dev
+  IMAGE_VERSION: latest
+  DOCKER_IMAGE: ${{ secrets.GKE_PROJECT }}/webui/gh-runner
   GITHUB_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
 jobs:

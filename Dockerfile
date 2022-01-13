@@ -50,6 +50,9 @@ RUN apt-get install -yq openjdk-$JDK_VERSION-jdk-headless \
   ghostscript \
   exiftool
 
+# remove policies that prevent PDF converters to work
+RUN sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml
+
 # set default JAVA_HOME
 RUN echo 'export JAVA_HOME=$(readlink -f `which javac` | sed "s:/bin/javac::")/bin/java' >> ~/.bashrc
 

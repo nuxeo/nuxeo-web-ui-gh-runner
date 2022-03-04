@@ -76,7 +76,7 @@ RUN apt-get install -yq rsync && \
   npm install -g gulp-cli
 
 # Install GH Runner
-ARG GH_RUNNER_VERSION="2.283.2"
+ARG GH_RUNNER_VERSION="2.288.1"
 WORKDIR /runner
 RUN apt-get install -yq jq
 RUN curl -o actions.tar.gz --location "https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/actions-runner-linux-x64-${GH_RUNNER_VERSION}.tar.gz" && \

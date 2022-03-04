@@ -16,6 +16,7 @@ spec:
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
     spec:
+      terminationGracePeriodSeconds: 3600
       containers:
         - name: runner
           image: "{{ .Values.runner.image.repository }}:{{ .Values.runner.image.tag }}"

@@ -57,14 +57,10 @@ RUN sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xm
 RUN echo 'export JAVA_HOME=$(readlink -f `which javac` | sed "s:/bin/javac::")/bin/java' >> ~/.bashrc
 
 # Install Node.jx
-ARG NODEJS_VERSION=10.24.1
-RUN curl -LO https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz && \
-  tar -xvf node-v${NODEJS_VERSION}-linux-x64.tar.xz && \
-  cp -r node-v${NODEJS_VERSION}-linux-x64/bin /usr/ && \
-  cp -r node-v${NODEJS_VERSION}-linux-x64/include /usr/ && \
-  cp -r node-v${NODEJS_VERSION}-linux-x64/lib /usr/ && \
-  cp -r node-v${NODEJS_VERSION}-linux-x64/share /usr/ && \
-  apt-get install -yq g++ build-essential
+ARG NODEJS_VERSION=10
+RUN curl -f --location https://deb.nodesource.com/setup_$NODEJS_VERSION.x | bash - && \
+    apt-get install -yq nodejs && \
+    apt-get install -yq g++ build-essential
 ENV NODE_OPTIONS --max-old-space-size=2048
 
 # Install Chrome
@@ -80,12 +76,13 @@ RUN apt-get install -yq rsync && \
   npm install -g gulp-cli
 
 # Install GH Runner
-ARG GH_RUNNER_VERSION="2.290.1"
+ARG GH_RUNNER_VERSION="2.288.1"
 WORKDIR /runner
 RUN apt-get install -yq jq
 RUN curl -o actions.tar.gz --location "https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/actions-runner-linux-x64-${GH_RUNNER_VERSION}.tar.gz" && \
     tar -zxf actions.tar.gz && \
-    rm -f actions.tar.gz
+    rm -f actions.tar.gz && \
+    ./bin/installdependencies.sh
 
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh

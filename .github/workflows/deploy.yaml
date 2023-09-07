@@ -46,7 +46,13 @@ jobs:
       - name: Create runner namespace
         if: ${{ !steps.runner_ns.outputs.exists }}
         run: |
+          echo ${{ !steps.runner_ns.outputs.exists }}
           kubectl create namespace ${{ env.RUNNER_NAMESPACE }}
+
+      - name: Verify runner namespace
+        run: |
+          echo ${{ env.RUNNER_NAMESPACE }}
+          kubectl get hpa -n ${{ env.RUNNER_NAMESPACE }}
 
       - name: Install runner image
         id: runner

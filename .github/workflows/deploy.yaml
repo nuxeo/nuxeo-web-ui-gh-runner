@@ -57,4 +57,4 @@ jobs:
           envsubst < values.yaml.tosubst > values.yaml
 
           # install
-          helm upgrade --install --namespace ${RUNNER_NAMESPACE} ${RUNNER_NAMESPACE} .
+          helm upgrade --install --namespace webui-runner webui-runner .

@@ -19,5 +19,5 @@ runner:
     tag: $IMAGE_VERSION
     pullPolicy: Always
   githubSecret:
-    name: web-ui-gh-runner-secret
+    name: web-ui-gh-runners-secret
     token: $GITHUB_ACCESS_TOKEN

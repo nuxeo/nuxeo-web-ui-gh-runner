@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web-ui-gh-runner-deployment
+  name: web-ui-gh-runners
   labels:
     app: runner
 spec:

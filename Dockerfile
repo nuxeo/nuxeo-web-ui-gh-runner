@@ -57,7 +57,7 @@ RUN sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xm
 RUN echo 'export JAVA_HOME=$(readlink -f `which javac` | sed "s:/bin/javac::")/bin/java' >> ~/.bashrc
 
 # Install Node.jx
-ARG NODEJS_VERSION=14
+ARG NODEJS_VERSION=18
 RUN curl -f --location https://deb.nodesource.com/setup_$NODEJS_VERSION.x | bash - && \
     apt-get install -yq nodejs && \
     apt-get install -yq g++ build-essential

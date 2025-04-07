@@ -21,3 +21,26 @@ runner:
   githubSecret:
     name: web-ui-gh-runner-secret
     token: $GITHUB_ACCESS_TOKEN
+
+probes:
+  readiness:
+    initialDelaySeconds: 15
+    periodSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+    timeoutSeconds: 2
+    command:
+      - pgrep
+      - -f
+      - Runner.Listener
+
+  liveness:
+    initialDelaySeconds: 30
+    periodSeconds: 20
+    failureThreshold: 3
+    successThreshold: 1
+    timeoutSeconds: 2
+    command:
+      - pgrep
+      - -f
+      - Runner.Listener

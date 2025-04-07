@@ -38,6 +38,24 @@ spec:
                     "-c",
                     'RUNNER_ALLOW_RUNASROOT=1 ./config.sh remove --token $(curl -sS --request POST --url "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runners/remove-token" --header "authorization: Bearer ${GITHUB_TOKEN}"  --header "content-type: application/json" | jq -r .token)',
                   ]
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+            successThreshold: {{ .Values.probes.readiness.successThreshold }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            exec:
+              command:
+                {{- toYaml .Values.probes.readiness.command | nindent 16 }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+            successThreshold: {{ .Values.probes.liveness.successThreshold }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            exec:
+              command:
+                {{- toYaml .Values.probes.liveness.command | nindent 16 }}
           resources:
             requests:
               memory: {{ .Values.resources.requests.memory }}

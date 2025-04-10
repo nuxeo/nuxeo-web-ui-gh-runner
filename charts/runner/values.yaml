@@ -7,10 +7,10 @@ autoscaling:
 
 resources: 
   limits:
-    memory: "8Gi"
+    memory: "10Gi"
     cpu: "6"
   requests:
-    memory: "6Gi"
+    memory: "8Gi"
     cpu: "4"
 
 runner:
